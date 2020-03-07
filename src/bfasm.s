@@ -15,264 +15,6 @@ open_err_str_len equ $-open_err_str
 stat_err_str: db "unable to stat file",0xa
 stat_err_str_len equ $-stat_err_str
 
-dispatch:
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-    dq inc_cell
-    dq replace_cell
-    dq dec_cell
-    dq output_cell
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-    dq mov_ptr_left
-	dq end
-    dq mov_ptr_right
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-    dq branch_forward
-	dq end
-    dq branch_backward
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-	dq end
-
 section .bss
 buffer: resb 256
 
@@ -331,16 +73,41 @@ _start:
     ; r13   - cell pointer
     ; rsp   - call stack
 
+    xor r15, r15
     .loop:
         cmp r14, r12
         je short dispatch_return.loop_end
 
         xor rsi, rsi
         mov sil, byte [r12]
-        lea rax, [rsi * 8 + dispatch]
-        jmp [rax] ; dispatch table
+        cmp sil, '+'
+        jz inc_cell
+        cmp sil, '>'
+        jz mov_ptr_right
+        cmp sil, '<'
+        jz mov_ptr_left
+        cmp sil, '-'
+        jz dec_cell
+        cmp sil, '['
+        jz branch_forward
+        cmp sil, ']'
+        jz branch_backward
+        cmp sil, ','
+        jz replace_cell
+        cmp sil, '.'
+        jnz end
+
+        mov rax, 1
+        mov rdi, 1
+        mov rsi, r13
+        mov rdx, 1
+        ; syscall
+
 dispatch_return:
         inc r12
+        inc r15
+        cmp r15, 1000000000
+        je .loop_end
         jmp short _start.loop
     .loop_end:
 end:
@@ -365,23 +132,15 @@ mov_ptr_right:
     jmp dispatch_return
 
 inc_cell:
-    mov al, byte [r13]
+    mov al, [r13]
     inc al
     mov byte [r13], al
     jmp dispatch_return
 
 dec_cell:
-    mov al, byte [r13]
+    mov al, [r13]
     dec al
     mov byte [r13], al
-    jmp dispatch_return
-
-output_cell:
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, r13
-    mov rdx, 1
-    syscall
     jmp dispatch_return
 
 replace_cell:
@@ -389,18 +148,17 @@ replace_cell:
     xor edi, edi
     mov rsi, r13
     mov rdx, 1
-    jl error
+    syscall
     jmp dispatch_return
 
 branch_forward:
-    mov bl, byte [r13]
-    test bl, bl
+    cmp byte [r13], 0
     jnz .advance
 
-    mov rsi, 1
     xor r11, r11    ; nesting
     .loop:
-        mov dl, byte[r12 + rsi]
+        inc r12
+        mov dl, byte [r12]
         .B1:
             cmp dl, '['
             jne .B2
@@ -410,21 +168,17 @@ branch_forward:
             cmp dl, ']'
             jne .loop_rep
             test r11, r11
-            jz .loop_exit
+            jz .exit
             dec r11
         .loop_rep:
-            inc rsi
             jmp .loop
-    .loop_exit:
-    add r12, rsi
-    jmp dispatch_return
     .advance:
     push r12
+    .exit:
     jmp dispatch_return
 
 branch_backward:
-    mov bl, byte [r13]
-    test bl, bl
+    cmp byte [r13], 0
     jz .advance
     pop r12
     dec r12
