@@ -8,7 +8,6 @@
 section .data
 usage_str: db "usage: ./bfasm <filename>",0xa
 usage_str_len equ $-usage_str
-; dispatch table
 dispatch:
 	dq end
 	dq end
@@ -338,6 +337,7 @@ end:
     xor rdi, rdi
     mov rax, 60 ; sys_exit
     syscall
+
 usage:
     mov rax, 1
     mov rdi, 1
@@ -349,19 +349,23 @@ usage:
 mov_ptr_left:
     dec r13
     jmp dispatch_return
+
 mov_ptr_right:
     inc r13
     jmp dispatch_return
+
 inc_cell:
     mov al, byte [r13]
     inc al
     mov byte [r13], al
     jmp dispatch_return
+
 dec_cell:
     mov al, byte [r13]
     dec al
     mov byte [r13], al
     jmp dispatch_return
+
 output_cell:
     mov rax, 1
     mov rdi, 1
@@ -369,6 +373,7 @@ output_cell:
     mov rdx, 1
     syscall
     jmp dispatch_return
+
 replace_cell:
     xor eax, eax
     xor edi, edi
