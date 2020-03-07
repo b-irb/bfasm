@@ -2,7 +2,7 @@
 
 This is an implementation of the [Brainfuck language](https://github.com/brain-lang/brainfuck/blob/master/brainfuck.md). Brainfuck is an esolang which is closely resembles a Turing machine (with the addition of bulit-in conditional expressions).
 
-The interpreter is designed to use a dynamic dispatch table to improve performance compared to a switch ladder. The syscalls are somewhat unreliable as to what they clobber but I abused any preservation of registers to reduce the number of instructions.
+The syscalls are somewhat unreliable as to what they clobber but I abused any preservation of registers to reduce the number of instructions.
 
 Further development would involve:
 - Code alignment improvement
@@ -27,7 +27,7 @@ All testing code was found online and is not my own work. A demonstration of the
 
 ## Performance
 
-`bfasm` executed 1 billion Brainfuck operations in 5.59 seconds. Benchmarking included modifying `bfasm` to limit each process to 1 billion operations, and removing the syscall to `sys_write` as IO operations are not deterministic/challenging to benchmark meaningfully.
+`bfasm` executed 1 billion Brainfuck operations in 5.06 seconds. Benchmarking included modifying `bfasm` (example benchmark stub shown below) to limit each process to 1 billion operations, and removing the syscall to `sys_write` as IO operations are not deterministic/challenging to benchmark meaningfully.
 
 ```diff
 --- a/src/bfasm.s
@@ -65,38 +65,4 @@ Once patched and assembled with `make`, the below command was ran.
 
 `sudo perf stat -a -B -o perf_report --table -r 10 ./bfasm tests/fib.bf`
 
-```
-# started on Sat Mar  7 18:02:22 2020
-
-
- Performance counter stats for 'system wide' (10 runs):
-
-         11,170.47 msec cpu-clock                 #    1.999 CPUs utilized            ( +-  0.30% )
-             3,427      context-switches          #    0.307 K/sec                    ( +-  5.21% )
-                27      cpu-migrations            #    0.002 K/sec                    ( +- 31.48% )
-             4,253      page-faults               #    0.381 K/sec                    ( +- 53.76% )
-    17,826,817,126      cycles                    #    1.596 GHz                      ( +-  3.13% )  (81.67%)
-    24,164,307,344      stalled-cycles-frontend   #  135.55% frontend cycles idle     ( +-  1.24% )  (83.32%)
-       439,029,540      stalled-cycles-backend    #    2.46% backend cycles idle      ( +- 48.67% )  (35.01%)
-    16,091,252,177      instructions              #    0.90  insn per cycle
-                                                  #    1.50  stalled cycles per insn  ( +-  4.51% )  (51.68%)
-     5,650,682,525      branches                  #  505.859 M/sec                    ( +-  1.87% )  (66.68%)
-       147,064,553      branch-misses             #    2.60% of all branches          ( +-  0.67% )  (83.34%)
-
-            # Table of individual measurements:
-            5.6708 (+0.0836) #
-            5.6877 (+0.1004) #
-            5.6195 (+0.0322) #
-            5.5508 (-0.0365) #
-            5.5541 (-0.0332) #
-            5.5467 (-0.0406) #
-            5.5465 (-0.0408) #
-            5.5996 (+0.0123) #
-            5.5509 (-0.0363) #
-            5.5461 (-0.0412) #
-
-            # Final result:
-            5.5873 +- 0.0173 seconds time elapsed  ( +-  0.31% )
-```
-
-This evaluates to 178,977,324 Brainfuck operations a second (note: the elapsed execution time includes process startup and exit).
+Overall, the report evaluates to 197,424,284 Brainfuck operations a second (note: the elapsed execution time includes process startup and exit).
