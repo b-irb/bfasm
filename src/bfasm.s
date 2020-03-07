@@ -73,7 +73,6 @@ _start:
     ; r13   - cell pointer
     ; rsp   - call stack
 
-    xor r15, r15
     .loop:
         cmp r14, r12
         je short dispatch_return.loop_end
@@ -101,13 +100,10 @@ _start:
         mov rdi, 1
         mov rsi, r13
         mov rdx, 1
-        ; syscall
+        syscall
 
 dispatch_return:
         inc r12
-        inc r15
-        cmp r15, 1000000000
-        je .loop_end
         jmp short _start.loop
     .loop_end:
 end:
