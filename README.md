@@ -1,6 +1,6 @@
 # Brainfuck implementation in x86_64 assembly
 
-This is a very brittle implementation of the [Brainfuck language](https://github.com/brain-lang/brainfuck/blob/master/brainfuck.md). Brainfuck is an esolang which is solely a symbolic renaming of a Turing machine (with the addition of conditional expressions).
+This is an implementation of the [Brainfuck language](https://github.com/brain-lang/brainfuck/blob/master/brainfuck.md). Brainfuck is an esolang which is closely resembles a Turing machine (with the addition of bulit-in conditional expressions).
 
 The interpreter is designed to use a dynamic dispatch table to improve performance compared to a switch ladder. The syscalls are somewhat unreliable as to what they clobber but I abused any preservation of registers to reduce the number of instructions.
 
@@ -27,29 +27,76 @@ All testing code was found online and is not my own work. A demonstration of the
 
 ## Performance
 
-`bfasm` executed 100 million Brainfuck operations in 11 seconds. Below is the command used to benchmark `bfasm` (a counter was added inside `bfasm` to exit after 100 million loops). The benchmark included IO which does make the results variable with respect to process environment.
+`bfasm` executed 1 billion Brainfuck operations in 5.59 seconds. Benchmarking included modifying `bfasm` to limit each process to 1 billion operations, and removing the syscall to `sys_write` as IO operations are not deterministic/challenging to benchmark meaningfully.
 
-`sudo perf stat -a -B -o perf_report ./bfasm tests/fib.bf`
+```diff
+--- a/src/bfasm.s
++++ b/src/bfasm.s
+@@ -331,6 +331,7 @@ _start:
+     ; r13   - cell pointer
+     ; rsp   - call stack
+
++    xor r15, r15
+     .loop:
+         cmp r14, r12
+         je short dispatch_return.loop_end
+@@ -341,6 +342,9 @@ _start:
+         jmp [rax] ; dispatch table
+ dispatch_return:
+         inc r12
++        cmp r15, 1000000000
++        jg end
++        inc r15
+         jmp short _start.loop
+     .loop_end:
+ end:
+@@ -381,7 +385,7 @@ output_cell:
+     mov rdi, 1
+     mov rsi, r13
+     mov rdx, 1
+-    syscall
++    ; syscall
+     jmp dispatch_return
+
+ replace_cell:
+```
+
+Once patched and assembled with `make`, the below command was ran.
+
+`sudo perf stat -a -B -o perf_report --table -r 10 ./bfasm tests/fib.bf`
 
 ```
-# started on Sat Mar  7 16:59:56 2020
+# started on Sat Mar  7 18:02:22 2020
 
 
- Performance counter stats for 'system wide':
+ Performance counter stats for 'system wide' (10 runs):
 
-         22,143.71 msec cpu-clock                 #    2.000 CPUs utilized
-         3,079,079      context-switches          #    0.139 M/sec
-             3,205      cpu-migrations            #    0.145 K/sec
-             3,014      page-faults               #    0.136 K/sec
-    58,240,353,009      cycles                    #    2.630 GHz                      (83.33%)
-    24,991,483,732      stalled-cycles-frontend   #   42.91% frontend cycles idle     (83.34%)
-     4,934,886,849      stalled-cycles-backend    #    8.47% backend cycles idle      (33.33%)
-    45,220,683,689      instructions              #    0.78  insn per cycle
-                                                  #    0.55  stalled cycles per insn  (50.00%)
-    11,859,974,814      branches                  #  535.591 M/sec                    (66.66%)
-       321,981,384      branch-misses             #    2.71% of all branches          (83.32%)
+         11,170.47 msec cpu-clock                 #    1.999 CPUs utilized            ( +-  0.30% )
+             3,427      context-switches          #    0.307 K/sec                    ( +-  5.21% )
+                27      cpu-migrations            #    0.002 K/sec                    ( +- 31.48% )
+             4,253      page-faults               #    0.381 K/sec                    ( +- 53.76% )
+    17,826,817,126      cycles                    #    1.596 GHz                      ( +-  3.13% )  (81.67%)
+    24,164,307,344      stalled-cycles-frontend   #  135.55% frontend cycles idle     ( +-  1.24% )  (83.32%)
+       439,029,540      stalled-cycles-backend    #    2.46% backend cycles idle      ( +- 48.67% )  (35.01%)
+    16,091,252,177      instructions              #    0.90  insn per cycle
+                                                  #    1.50  stalled cycles per insn  ( +-  4.51% )  (51.68%)
+     5,650,682,525      branches                  #  505.859 M/sec                    ( +-  1.87% )  (66.68%)
+       147,064,553      branch-misses             #    2.60% of all branches          ( +-  0.67% )  (83.34%)
 
-      11.072156640 seconds time elapsed
+            # Table of individual measurements:
+            5.6708 (+0.0836) #
+            5.6877 (+0.1004) #
+            5.6195 (+0.0322) #
+            5.5508 (-0.0365) #
+            5.5541 (-0.0332) #
+            5.5467 (-0.0406) #
+            5.5465 (-0.0408) #
+            5.5996 (+0.0123) #
+            5.5509 (-0.0363) #
+            5.5461 (-0.0412) #
+
+            # Final result:
+            5.5873 +- 0.0173 seconds time elapsed  ( +-  0.31% )
 ```
 
-This evaluates to 9,031,664 operations a second (note: the elapsed execution time includes process startup and exit).
+This evaluates to 178,977,324 Brainfuck operations a second (note: the elapsed execution time includes process startup and exit).
