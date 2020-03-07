@@ -8,6 +8,13 @@
 section .data
 usage_str: db "usage: ./bfasm <filename>",0xa
 usage_str_len equ $-usage_str
+mmap_err_str: db "failed to allocate memory",0xa
+mmap_err_str_len equ $-mmap_err_str
+open_err_str: db "unable to open file",0xa
+open_err_str_len equ $-open_err_str
+stat_err_str: db "unable to stat file",0xa
+stat_err_str_len equ $-stat_err_str
+
 dispatch:
 	dq end
 	dq end
@@ -273,7 +280,6 @@ section .text
 global _start
 
 _start:
-    ; mmap a file
     xor rbp, rbp
     mov rdx, [rsp]
     cmp rdx, 2
@@ -284,11 +290,15 @@ _start:
     mov rsi, O_RDONLY
     mov rax, 2
     syscall ; sys_open
+    cmp rax, 0
+    jl open_error
     mov r8, rax
 
     lea rsi, [buffer]
     mov rax, 4
     syscall ; sys_stat
+    cmp rax, 0
+    jl stat_error
 
     mov rsi, [buffer + 48] ; st_size
     mov rdx, PROT_READ
@@ -379,7 +389,7 @@ replace_cell:
     xor edi, edi
     mov rsi, r13
     mov rdx, 1
-    syscall
+    jl error
     jmp dispatch_return
 
 branch_forward:
@@ -428,4 +438,28 @@ mmap_n:
     xor r9, r9
     mov rax, 9 ; sys_mmap
     syscall
+    cmp rax, 0
+    jl mmap_error
     ret
+
+mmap_error:
+    mov rsi, mmap_err_str
+    mov rdx, mmap_err_str_len
+    jmp error
+
+stat_error:
+    mov rsi, stat_err_str
+    mov rdx, stat_err_str_len
+    jmp error
+
+open_error:
+    mov rsi, open_err_str
+    mov rdx, open_err_str_len
+
+error:
+    push rax
+    mov rax, 1
+    mov rdi, 1
+    syscall ; sys_write
+    pop rdi
+    jmp end+3
