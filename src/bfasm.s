@@ -101,9 +101,9 @@ dispatch:
 	dq end
 	dq end
 	dq end
-    dq jmp_cellz
+    dq branch_forward
 	dq end
-    dq jmp_cellnz
+    dq branch_backward
 	dq end
 	dq end
 	dq end
@@ -268,7 +268,7 @@ dispatch:
 	dq end
 
 section .bss
-stat_struc: resb 144
+buffer: resb 256
 
 section .text
 global _start
@@ -287,32 +287,40 @@ _start:
     syscall ; sys_open
     mov r8, rax
 
-    lea rsi, [stat_struc]
+    lea rsi, [buffer]
     mov rax, 4
     syscall ; sys_stat
 
-    mov rsi, [stat_struc + 48] ; st_size
+    mov rsi, [buffer + 48] ; st_size
     mov rdx, PROT_READ
     mov r10, MAP_PRIVATE
     call mmap_n
     mov r12, rax        ; addr of file
     lea r14, [rsi + r12]; size of file
 
+    xor r15, r15
+
+    .mmap:
     mov rsi, 0x800 ; 2K
     mov rdx, PROT_READ|PROT_WRITE
     mov r10, MAP_PRIVATE|MAP_ANON
     xor r8, r8
     call mmap_n
+    xor r15, 1
+    jnz .first_iter_mmap
+    add rax, 0x800
+    mov rsp, rax
+    jmp .loop
+    .first_iter_mmap:
     mov r13, rax
+    jmp .mmap
 
     ; register usage
     ; r14   - code end pointer
     ; r13   - pointer
     ; r12   - code pointer
     ; r13   - cell pointer
-    ; r9    - level of nesting
-
-    ; use the stack to store branch entry points
+    ; rsp   - call stack
 
     .loop:
         cmp r14, r12
@@ -368,43 +376,45 @@ replace_cell:
     mov rdx, 1
     syscall
     jmp dispatch_return
-jmp_cellz:
-    xor esi, esi
+
+branch_forward:
     mov bl, byte [r13]
     test bl, bl
     jnz .advance
-    add esi, 1
-    xor r9, r9
+
+    mov rsi, 1
+    xor r11, r11    ; nesting
     .loop:
-        mov dl, byte [r12 + rsi]
+        mov dl, byte[r12 + rsi]
         .B1:
             cmp dl, '['
             jne .B2
-            inc r9
-            jmp .loop_end
+            inc r11
+            jmp .loop_rep
         .B2:
             cmp dl, ']'
-            jne .loop_end
-            test r9, r9
-            jz .end
-            dec r9
-    .loop_end:
-        inc rsi
-        jmp .loop
-    .end:
+            jne .loop_rep
+            test r11, r11
+            jz .loop_exit
+            dec r11
+        .loop_rep:
+            inc rsi
+            jmp .loop
+    .loop_exit:
     add r12, rsi
     jmp dispatch_return
     .advance:
     push r12
     jmp dispatch_return
-jmp_cellnz:
+
+branch_backward:
     mov bl, byte [r13]
     test bl, bl
-    jz .end
+    jz .advance
     pop r12
-    dec r12 ; account for inc
+    dec r12
     jmp dispatch_return
-    .end:
+    .advance:
     add rsp, 8
     jmp dispatch_return
 
