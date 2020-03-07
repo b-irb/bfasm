@@ -23,4 +23,4 @@ usage: ./bfasm <filename>
 
 All testing code was found online and is not my own work. A demonstration of the interpreter using [Daniel B. Cristofani's](http://www.hevanet.com/cristofd/brainfuck/) Fibonacci implementation.
 
-![example usage]()
+![example usage](https://raw.githubusercontent.com/birb007/bfasm/master/demo/demo.png)
