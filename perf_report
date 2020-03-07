@@ -1,0 +1,32 @@
+# started on Sat Mar  7 23:44:59 2020
+
+
+ Performance counter stats for 'system wide' (10 runs):
+
+         10,129.28 msec cpu-clock                 #    2.000 CPUs utilized            ( +-  0.01% )
+               370      context-switches          #    0.037 K/sec                    ( +-  3.12% )
+                 6      cpu-migrations            #    0.001 K/sec                    ( +- 22.22% )
+                11      page-faults               #    0.001 K/sec                    ( +- 19.73% )
+    14,698,386,463      cycles                    #    1.451 GHz                      ( +-  0.02% )  (83.29%)
+    20,251,864,188      stalled-cycles-frontend   #  137.78% frontend cycles idle     ( +-  0.02% )  (83.31%)
+         6,195,360      stalled-cycles-backend    #    0.04% backend cycles idle      ( +-  8.42% )  (33.39%)
+    19,476,392,105      instructions              #    1.33  insn per cycle         
+                                                  #    1.04  stalled cycles per insn  ( +-  0.01% )  (50.05%)
+     7,641,911,079      branches                  #  754.438 M/sec                    ( +-  0.01% )  (66.69%)
+        31,724,883      branch-misses             #    0.42% of all branches          ( +-  0.65% )  (83.34%)
+
+          # Table of individual measurements:
+          5.066775 (+0.001542) #
+          5.060690 (-0.004543) #
+          5.064762 (-0.000471) #
+          5.064770 (-0.000463) #
+          5.064841 (-0.000392) #
+          5.065797 (+0.000564) #
+          5.066864 (+0.001631) #
+          5.064862 (-0.000371) #
+          5.068070 (+0.002837) #
+          5.064900 (-0.000333) #
+
+          # Final result:
+          5.065233 +- 0.000623 seconds time elapsed  ( +-  0.01% )
+
