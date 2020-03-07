@@ -5,7 +5,7 @@ NASM = nasm
 NASMFLAGS = -felf64
 
 # linker flags
-LDFLAGS = -s
+LDFLAGS = 
 
 # object files
 OBJ := src/bfasm.o
