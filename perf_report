@@ -1,32 +1,32 @@
-# started on Sat Mar  7 23:44:59 2020
+# started on Wed Mar 11 20:37:52 2020
 
 
  Performance counter stats for 'system wide' (10 runs):
 
-         10,129.28 msec cpu-clock                 #    2.000 CPUs utilized            ( +-  0.01% )
-               370      context-switches          #    0.037 K/sec                    ( +-  3.12% )
-                 6      cpu-migrations            #    0.001 K/sec                    ( +- 22.22% )
-                11      page-faults               #    0.001 K/sec                    ( +- 19.73% )
-    14,698,386,463      cycles                    #    1.451 GHz                      ( +-  0.02% )  (83.29%)
-    20,251,864,188      stalled-cycles-frontend   #  137.78% frontend cycles idle     ( +-  0.02% )  (83.31%)
-         6,195,360      stalled-cycles-backend    #    0.04% backend cycles idle      ( +-  8.42% )  (33.39%)
-    19,476,392,105      instructions              #    1.33  insn per cycle         
-                                                  #    1.04  stalled cycles per insn  ( +-  0.01% )  (50.05%)
-     7,641,911,079      branches                  #  754.438 M/sec                    ( +-  0.01% )  (66.69%)
-        31,724,883      branch-misses             #    0.42% of all branches          ( +-  0.65% )  (83.34%)
+        138,212.69 msec cpu-clock                 #    2.000 CPUs utilized            ( +-  0.45% )
+            83,683      context-switches          #    0.605 K/sec                    ( +-  0.96% )
+                56      cpu-migrations            #    0.000 K/sec                    ( +- 26.28% )
+             9,399      page-faults               #    0.068 K/sec                    ( +- 32.48% )
+   212,040,546,284      cycles                    #    1.534 GHz                      ( +-  0.22% )  (83.32%)
+   287,922,214,926      stalled-cycles-frontend   #  135.79% frontend cycles idle     ( +-  0.07% )  (83.33%)
+     2,749,050,569      stalled-cycles-backend    #    1.30% backend cycles idle      ( +-  4.02% )  (33.34%)
+   219,071,566,765      instructions              #    1.03  insn per cycle         
+                                                  #    1.31  stalled cycles per insn  ( +-  0.22% )  (50.01%)
+    90,551,141,933      branches                  #  655.158 M/sec                    ( +-  0.11% )  (66.67%)
+     1,082,746,794      branch-misses             #    1.20% of all branches          ( +-  0.17% )  (83.34%)
 
-          # Table of individual measurements:
-          5.066775 (+0.001542) #
-          5.060690 (-0.004543) #
-          5.064762 (-0.000471) #
-          5.064770 (-0.000463) #
-          5.064841 (-0.000392) #
-          5.065797 (+0.000564) #
-          5.066864 (+0.001631) #
-          5.064862 (-0.000371) #
-          5.068070 (+0.002837) #
-          5.064900 (-0.000333) #
+            # Table of individual measurements:
+            68.098 (-1.009) #
+            68.388 (-0.719) #
+            68.165 (-0.941) #
+            68.160 (-0.947) #
+            68.170 (-0.937) #
+            69.403 (+0.296) #
+            70.113 (+1.006) #
+            70.201 (+1.094) #
+            70.159 (+1.052) #
+            70.210 (+1.103) #
 
-          # Final result:
-          5.065233 +- 0.000623 seconds time elapsed  ( +-  0.01% )
+            # Final result:
+            69.107 +- 0.313 seconds time elapsed  ( +-  0.45% )
 
