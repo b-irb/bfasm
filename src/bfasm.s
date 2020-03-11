@@ -4,6 +4,7 @@
 
 %define MAP_PRIVATE 2
 %define MAP_ANON 32
+%define TAPE_LENGTH 0xa000
 
 section .data
 usage_str: db "usage: ./bfasm <filename>",0xa
@@ -52,19 +53,28 @@ _start:
     xor r15, r15
 
     .mmap:
-    mov rsi, 0x800 ; 2K
+    mov rsi, TAPE_LENGTH
     mov rdx, PROT_READ|PROT_WRITE
     mov r10, MAP_PRIVATE|MAP_ANON
     xor r8, r8
     call mmap_n
     xor r15, 1
     jnz .first_iter_mmap
-    add rax, 0x800
+    add rax, TAPE_LENGTH
     mov rsp, rax
     jmp .loop
     .first_iter_mmap:
     mov r13, rax
     jmp .mmap
+
+    ; zero program memory
+    mov rbx, r13
+    lea rcx, [r13 + TAPE_LENGTH]
+    .zero:
+        add qword [rbx], 0
+        add rbx, 8
+        cmp rbx, rcx
+        jl .zero
 
     ; register usage
     ; r14   - code end pointer
@@ -94,7 +104,7 @@ _start:
         cmp sil, ','
         jz replace_cell
         cmp sil, '.'
-        jnz end
+        jnz dispatch_return
 
         mov rax, 1
         mov rdi, 1
