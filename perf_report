@@ -1,19 +1,23 @@
-# started on Wed Apr 29 16:56:59 2020
+# started on Wed Apr 29 17:04:54 2020
 
 
  Performance counter stats for 'system wide':
 
-        122,875.89 msec cpu-clock                 #    2.000 CPUs utilized          
-            25,121      context-switches          #    0.204 K/sec                  
-                34      cpu-migrations            #    0.000 K/sec                  
-            36,918      page-faults               #    0.300 K/sec                  
-   184,809,618,338      cycles                    #    1.504 GHz                      (83.32%)
-   242,628,815,150      stalled-cycles-frontend   #  131.29% frontend cycles idle     (83.33%)
-     2,724,288,838      stalled-cycles-backend    #    1.47% backend cycles idle      (33.34%)
-   198,970,189,688      instructions              #    1.08  insn per cycle         
-                                                  #    1.22  stalled cycles per insn  (50.01%)
-    77,471,597,806      branches                  #  630.487 M/sec                    (66.67%)
-     1,042,466,877      branch-misses             #    1.35% of all branches          (83.34%)
+        122,336.87 msec cpu-clock                 #    2.000 CPUs utilized          
+             6,653      context-switches          #    0.054 K/sec                  
+                23      cpu-migrations            #    0.000 K/sec                  
+             1,648      page-faults               #    0.013 K/sec                  
+   178,542,662,691      cycles                    #    1.459 GHz                      (20.00%)
+   245,212,074,098      stalled-cycles-frontend   #  137.34% frontend cycles idle     (20.00%)
+       251,995,598      stalled-cycles-backend    #    0.14% backend cycles idle      (20.00%)
+   195,779,105,626      instructions              #    1.10  insn per cycle         
+                                                  #    1.25  stalled cycles per insn  (30.00%)
+    76,829,830,477      branches                  #  628.019 M/sec                    (40.00%)
+     1,016,800,345      branch-misses             #    1.32% of all branches          (50.00%)
+    22,707,334,956      L1-dcache-loads           #  185.613 M/sec                    (50.00%)
+        10,221,222      L1-dcache-load-misses     #    0.05% of all L1-dcache hits    (50.00%)
+        22,704,426      LLC-loads                 #    0.186 M/sec                    (50.00%)
+         3,970,511      LLC-load-misses           #   17.49% of all LL-cache hits     (50.00%)
 
-      61.439223851 seconds time elapsed
+      61.171997831 seconds time elapsed
 
