@@ -1,13 +1,10 @@
 # Brainfuck implementation in x86_64 assembly
 
-This is an implementation of the [Brainfuck language](https://github.com/brain-lang/brainfuck/blob/master/brainfuck.md). Brainfuck is an esolang which is closely resembles a Turing machine (with the addition of bulit-in conditional expressions).
-
-The syscalls are somewhat unreliable as to what they clobber but I abused any preservation of registers to reduce the number of instructions.
+This is an implementation of the [Brainfuck language](https://github.com/brain-lang/brainfuck/blob/master/brainfuck.md). Brainfuck is an esolang which is closely resembles a Turing machine (with the addition of bulit-in conditional expressions). The interpreter is implemented using a switch table (jump tables were less performant) and a 32 byte IO buffer to improve performance.
 
 Further development would involve:
 - Code alignment improvement
 - Ordering of operations to reduce port load
-- Reorganisation of branches to improve branch predictor
 
 Installation and build instructions:
 ```
@@ -27,8 +24,8 @@ All testing code was found online and is not my own work. A demonstration of the
 
 ## Performance
 
-`bfasm` executed 10,521,107,970 Brainfuck operations in 69.1 seconds (152,243,737.5/s).
+`bfasm` executed 10,521,107,970 Brainfuck operations in 67.27 seconds (156,424,442/s).
 
-`sudo perf stat -a -B -o perf_report --table -r 10 ./bfasm tests/mandelbrot.bf`
+`sudo perf stat -a -B -o perf_report ./bfasm tests/mandelbrot.bf`
 
 Note: the elapsed time includes process initialisation and destruction.

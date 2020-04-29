@@ -6,7 +6,23 @@
 %define MAP_ANON 32
 %define TAPE_LENGTH 0xa000
 
+%define CACHE_SIZE 32
+
+%macro do_syscall 0
+    push r14
+    push r13
+    push r12
+    push r11
+    syscall
+    pop r11
+    pop r12
+    pop r13
+    pop r14
+%endmacro
+
 section .data
+cache: times CACHE_SIZE db 0
+
 usage_str: db "usage: ./bfasm <filename>",0xa
 usage_str_len equ $-usage_str
 mmap_err_str: db "failed to allocate memory",0xa
@@ -62,7 +78,7 @@ _start:
     jnz .first_iter_mmap
     add rax, TAPE_LENGTH
     mov rsp, rax
-    jmp .loop
+    jmp .loop_init
     .first_iter_mmap:
     mov r13, rax
     jmp .mmap
@@ -78,14 +94,17 @@ _start:
 
     ; register usage
     ; r14   - code end pointer
-    ; r13   - pointer
-    ; r12   - code pointer
     ; r13   - cell pointer
+    ; r12   - code pointer
+    ; r11   - cache ptr
     ; rsp   - call stack
+
+    .loop_init:
+        mov r11, cache
 
     .loop:
         cmp r14, r12
-        je short dispatch_return.loop_end
+        je dispatch_return.loop_end
 
         xor rsi, rsi
         mov sil, byte [r12]
@@ -106,16 +125,35 @@ _start:
         cmp sil, '.'
         jnz dispatch_return
 
-        mov rax, 1
-        mov rdi, 1
-        mov rsi, r13
-        mov rdx, 1
-        syscall
+        ; add byte to cache
+        mov dl, byte [r13]
+        mov byte [r11], dl
+        inc r11
+
+        cmp r11, cache + CACHE_SIZE - 1
+        jne short dispatch_return
+
+        .flush_cache:
+            mov rax, 1
+            mov rdi, 1
+            mov rsi, cache
+            mov rdx, CACHE_SIZE
+            do_syscall
+
+            ; reset cache offset
+            mov r11, cache
 
 dispatch_return:
         inc r12
-        jmp short _start.loop
+        jmp _start.loop
     .loop_end:
+    .dump_io_cache:
+        mov rax, 1
+        mov rdi, 1
+        mov rsi, cache
+        mov rdx, r11
+        sub rdx, rsi
+        syscall
 end:
     xor rdi, rdi
     mov rax, 60 ; sys_exit
@@ -154,28 +192,28 @@ replace_cell:
     xor edi, edi
     mov rsi, r13
     mov rdx, 1
-    syscall
+    do_syscall
     jmp dispatch_return
 
 branch_forward:
     cmp byte [r13], 0
     jnz .advance
 
-    xor r11, r11    ; nesting
+    xor r8, r8    ; nesting
     .loop:
         inc r12
         mov dl, byte [r12]
         .B1:
             cmp dl, '['
             jne .B2
-            inc r11
+            inc r8
             jmp .loop_rep
         .B2:
             cmp dl, ']'
             jne .loop_rep
-            test r11, r11
+            test r8, r8
             jz .exit
-            dec r11
+            dec r8
         .loop_rep:
             jmp .loop
     .advance:
@@ -197,7 +235,7 @@ mmap_n:
     xor rdi, rdi
     xor r9, r9
     mov rax, 9 ; sys_mmap
-    syscall
+    do_syscall
     cmp rax, 0
     jl mmap_error
     ret

@@ -1,32 +1,19 @@
-# started on Wed Mar 11 20:37:52 2020
+# started on Wed Apr 29 16:28:14 2020
 
 
- Performance counter stats for 'system wide' (10 runs):
+ Performance counter stats for 'system wide':
 
-        138,212.69 msec cpu-clock                 #    2.000 CPUs utilized            ( +-  0.45% )
-            83,683      context-switches          #    0.605 K/sec                    ( +-  0.96% )
-                56      cpu-migrations            #    0.000 K/sec                    ( +- 26.28% )
-             9,399      page-faults               #    0.068 K/sec                    ( +- 32.48% )
-   212,040,546,284      cycles                    #    1.534 GHz                      ( +-  0.22% )  (83.32%)
-   287,922,214,926      stalled-cycles-frontend   #  135.79% frontend cycles idle     ( +-  0.07% )  (83.33%)
-     2,749,050,569      stalled-cycles-backend    #    1.30% backend cycles idle      ( +-  4.02% )  (33.34%)
-   219,071,566,765      instructions              #    1.03  insn per cycle         
-                                                  #    1.31  stalled cycles per insn  ( +-  0.22% )  (50.01%)
-    90,551,141,933      branches                  #  655.158 M/sec                    ( +-  0.11% )  (66.67%)
-     1,082,746,794      branch-misses             #    1.20% of all branches          ( +-  0.17% )  (83.34%)
+        134,527.37 msec cpu-clock                 #    2.000 CPUs utilized          
+            11,524      context-switches          #    0.086 K/sec                  
+                17      cpu-migrations            #    0.000 K/sec                  
+                26      page-faults               #    0.000 K/sec                  
+   196,439,409,864      cycles                    #    1.460 GHz                      (83.33%)
+   273,227,014,382      stalled-cycles-frontend   #  139.09% frontend cycles idle     (83.33%)
+       272,252,488      stalled-cycles-backend    #    0.14% backend cycles idle      (33.34%)
+   206,862,721,582      instructions              #    1.05  insn per cycle         
+                                                  #    1.32  stalled cycles per insn  (50.01%)
+    88,065,134,291      branches                  #  654.626 M/sec                    (66.67%)
+       988,039,926      branch-misses             #    1.12% of all branches          (83.34%)
 
-            # Table of individual measurements:
-            68.098 (-1.009) #
-            68.388 (-0.719) #
-            68.165 (-0.941) #
-            68.160 (-0.947) #
-            68.170 (-0.937) #
-            69.403 (+0.296) #
-            70.113 (+1.006) #
-            70.201 (+1.094) #
-            70.159 (+1.052) #
-            70.210 (+1.103) #
-
-            # Final result:
-            69.107 +- 0.313 seconds time elapsed  ( +-  0.45% )
+      67.266186589 seconds time elapsed
 
