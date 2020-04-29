@@ -8,6 +8,11 @@
 
 %define CACHE_SIZE 32
 
+%macro retn_loop 0
+    inc r12
+    jmp _start.loop
+%endmacro
+
 %macro do_syscall 0
     push r14
     push r13
@@ -169,23 +174,23 @@ usage:
 
 mov_ptr_left:
     dec r13
-    jmp dispatch_return
+    retn_loop
 
 mov_ptr_right:
     inc r13
-    jmp dispatch_return
+    retn_loop
 
 inc_cell:
     mov al, [r13]
     inc al
     mov byte [r13], al
-    jmp dispatch_return
+    retn_loop
 
 dec_cell:
     mov al, [r13]
     dec al
     mov byte [r13], al
-    jmp dispatch_return
+    retn_loop
 
 replace_cell:
     xor eax, eax
@@ -193,7 +198,7 @@ replace_cell:
     mov rsi, r13
     mov rdx, 1
     do_syscall
-    jmp dispatch_return
+    retn_loop
 
 branch_forward:
     cmp byte [r13], 0
@@ -219,17 +224,17 @@ branch_forward:
     .advance:
     push r12
     .exit:
-    jmp dispatch_return
+    retn_loop
 
 branch_backward:
     cmp byte [r13], 0
     jz .advance
     pop r12
     dec r12
-    jmp dispatch_return
+    retn_loop
     .advance:
     add rsp, 8
-    jmp dispatch_return
+    retn_loop
 
 mmap_n:
     xor rdi, rdi
